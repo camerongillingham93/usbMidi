@@ -62,9 +62,22 @@ int main(void)
                     /** and change the frequency of the oscillator */
                     auto note_msg = msg.AsNoteOn();
                     if(note_msg.velocity != 0)
+                    {
+                        // Map the velocity to a suitable amplitude range (e.g., 0.0 to 1.0)
+                        float amplitude
+                            = static_cast<float>(note_msg.velocity) / 127.0f;
+
                         osc.SetFreq(mtof(note_msg.note));
+                        osc.SetAmp(amplitude);
+                    }
                 }
                 break;
+                case NoteOff:
+                {
+                    /** Handle Note Off message */
+                    auto note_msg = msg.AsNoteOff();
+                    osc.SetFreq(0.0f);
+                }
                     // Since we only care about note-on messages in this example
                     // we'll ignore all other message types
                 default: break;
