@@ -8,6 +8,8 @@
  */
 #include "daisy_seed.h"
 #include "daisysp.h"
+#include <unordered_map>
+
 
 using namespace daisy;
 using namespace daisysp;
@@ -15,6 +17,9 @@ using namespace daisysp;
 DaisySeed      hw;
 MidiUsbHandler midi;
 Oscillator     osc;
+
+// Add a data structure to keep track of note states
+std::unordered_map<int, bool> noteStates;
 
 void AudioCallback(AudioHandle::InputBuffer  in,
                    AudioHandle::OutputBuffer out,
@@ -45,6 +50,10 @@ int main(void)
 
     /** And start the audio callback */
     hw.StartAudio(AudioCallback);
+
+    // Initialize noteStates map
+    noteStates = std::unordered_map<int, bool>();
+
     while(1)
     {
         /** Listen to MIDI for new changes */
@@ -53,7 +62,7 @@ int main(void)
         /** When there are messages waiting in the queue... */
         while(midi.HasEvents())
         {
-            /** Pull the oldest one from the list... */
+  /** Pull the oldest one from the list... */
             auto msg = midi.PopEvent();
             switch(msg.type)
             {
@@ -78,10 +87,11 @@ int main(void)
                     auto note_msg = msg.AsNoteOff();
                     osc.SetFreq(0.0f);
                 }
-                    // Since we only care about note-on messages in this example
-                    // we'll ignore all other message types
                 default: break;
             }
         }
     }
 }
+
+
+
